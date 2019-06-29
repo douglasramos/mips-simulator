@@ -1,0 +1,74 @@
+[Project]
+Current Flow=Generic
+VCS=0
+version=4
+Current Config=compile
+
+[Configurations]
+compile=Pipeline
+
+[Library]
+Pipeline=.\Pipeline\Pipeline.lib
+biblioteca_de_componentes=.\..\..\..\aldec\active-hdl-student-edition\vlib\biblioteca_de_componentesv4.5\biblioteca_de_componentes.lib
+
+[Settings]
+AccessRead=0
+AccessReadWrite=0
+AccessACCB=0
+AccessACCR=0
+AccessReadWriteSLP=0
+AccessReadTopLevel=1
+DisableC=1
+ENABLE_ADV_DATAFLOW=0
+FLOW_TYPE=HDL
+LANGUAGE=VHDL
+REFRESH_FLOW=1
+FLOWTOOLS=NONE
+FAMILY=
+
+[LocalVerilogSets]
+EnableSLP=1
+EnableDebug=0
+
+[LocalVhdlSets]
+CompileWithDebug=0
+
+[$LibMap$]
+Pipeline=.
+Active_lib=
+biblioteca_de_componentes=.
+
+[Folders]
+Name3=Makefiles
+Directory3=c:\My_Designs\Coprocessador_POLI\Pipeline\
+Extension3=mak
+Name4=Memory
+Directory4=c:\My_Designs\Coprocessador_POLI\Pipeline\
+Extension4=mem;mif;hex
+Name5=Dll Libraries
+Directory5=c:\My_Designs\Coprocessador_POLI\Pipeline\
+Extension5=dll
+Name6=PDF
+Directory6=c:\My_Designs\Coprocessador_POLI\Pipeline\
+Extension6=pdf
+Name7=HTML
+Directory7=c:\My_Designs\Coprocessador_POLI\Pipeline\
+Extension7=htm;html
+
+[SpecTracer]
+WindowVisible=0
+
+[HierarchyViewer]
+HierarchyInformation=
+ShowHide=ShowTopLevel
+Selected=
+
+[Files]
+/F_POLI.bde=-1
+/F_MIPS.bde=-1
+
+[Files.Data]
+.\src\F_POLI.bde=Block Diagram
+.\src\F_MIPS.bde=Block Diagram
+.\src\registerFile.bde=Block Diagram
+

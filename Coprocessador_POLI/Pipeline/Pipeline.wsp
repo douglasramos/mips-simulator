@@ -1,0 +1,22 @@
+[CACHEDOC|Aldec.Project.Generic.7|.\Pipeline\Pipeline.adf|]
+Path=
+[CACHEDOC|Aldec.Hde.HdePlugIn.7|.\..\Biblioteca_de_ComponentesV4.5\Biblioteca_de_Componentes.LIB|]
+CurrentLine=0
+CurrentColumn=0
+Bookmarks=-1
+BookmarksLength=3
+CurrentZoomFactor=1.000000
+Frame=0
+WindowWorkspaceInfo="LAAAAAAAAAADAAAA//////////////////////kAAAB6AAAAVgUAAGoCAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADIAAAAyAAAAAAAAAAAAAAAyAAAAMgAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAEAAAA="
+[COMPILESTATUS|.\src\F_POLI.bde]
+FileTimeLow=30748274
+Status=Modified
+[COMPILESTATUS|.\src\F_MIPS.bde]
+FileTimeLow=30748274
+Status=Modified
+[CACHESIMPLE|Aldec.SymbolsCommands.7]
+Pipeline=1
+Built-in symbols=1
+biblioteca_de_componentes=0
+[Gui config]
+RunFor=100 ns

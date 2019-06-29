@@ -1,0 +1,13 @@
+timestamp=1561811871567
+
+[~A]
+ModifyID=10
+
+[fub1]
+NSymbols/fub1=NSymbols/Fub1 40|0|2*0
+
+[~MFT]
+2=2|2Pipeline.mgf||415
+
+[~U]
+fub1=Fub1 11|||0x7
