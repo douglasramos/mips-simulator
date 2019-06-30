@@ -20,8 +20,10 @@
 -- Design unit header --
 library IEEE;
 use IEEE.std_logic_1164.all;
-use IEEE.std_logic_arith.all;
 use IEEE.std_logic_signed.all;
+use IEEE.numeric_std.all;
+
+library biblioteca_de_componentes;
 
 entity ULAmodified is
   generic(
@@ -35,10 +37,10 @@ entity ULAmodified is
        Veum 	: in 	std_logic;
        A 		: in 	std_logic_vector(NB - 1 downto 0);
        B 		: in 	std_logic_vector(NB - 1 downto 0);
-       cUla 	: in 	std_logic_vector(2 downto 0);
+       cUla 	: in 	std_logic_vector(3 downto 0);
        Sinal 	: out 	std_logic;
-       Equal 	: out 	std_logic;
-       Compare 	: out 	std_logic;
+       Vaum 	: out 	std_logic;
+       Zero 	: out 	std_logic;
        C 		: out 	std_logic_vector(NB - 1 downto 0)
   );
 end ULAmodified;
@@ -46,40 +48,68 @@ end ULAmodified;
 architecture ULAmodified of ULAmodified is
 
 ---- Architecture declarations -----
-signal S_NB 	: std_logic_vector (NB downto 0);
-signal Zer 		: std_logic_vector (NB - 1 downto 0) := (others => '0');
+signal S_NB, Eq, Cmp 	: std_logic_vector (NB downto 0);
+signal Zer, D, nd 		: std_logic_vector (NB - 1 downto 0) := (others => '0');
+signal zeros 		: std_logic_vector (NB - 2 downto 0) := (others => '0');
 signal Upper 	: std_logic_vector (NB downto 0) := ( '1', others => '0');
+signal n: integer := 2;
+
+
+---------- deslocador -------------------------------
+component deslocador_combinatorio
+  generic(
+       NB : integer := 8;
+       NBD : integer := 2;
+       Tprop : time := 1 ns
+  );
+  port(
+       DE : in std_logic;
+       I : in std_logic_vector(NB - 1 downto 0);
+       O : out std_logic_vector(NB - 1 downto 0)
+  );
+end component;
+----------------------------------------------------
 
 
 begin
 
+n <= to_integer(unsigned(B));
+Eq <= zeros & "01" when A = B else zeros & "00";
+Cmp <= zeros & "01" when A < B else zeros & "00";	
+	
 ---- User Signal Assignments ----
 With cUla select
-		S_NB <=	(('0' &  A) + Veum )		when "000",
-				(('0' &  A) + B + Veum )	when "001",
-				(('0' &  B) + Veum )		when "010",
-				(('0' &  A) - B + Veum )	when "011",
-				('0' &  (A and B))			when "100",
-				('0' &  (A or B))			when "101",
-				('0' &  (A xor B))			when "110",
-				('0' & (not A))				when "111",
+		S_NB <=	(('0' &  A) + Veum )		when "0000",
+				(('0' &  A) + B + Veum )	when "0001",
+				(('0' &  B) + Veum )		when "0010",
+				(('0' &  A) - B + Veum )	when "0011",
+				('0' &  (A and B))			when "0100",
+				('0' &  (A or B))			when "0101",
+				 Eq					when "0110",
+				 Cmp					when "0111",
+				 (('0' & D) + Veum) 		when "1000",
 				(others => '0')				when others;
-
+-- Saída de Vai um
+Vaum <=	S_NB(NB) after Tsom;
 -- Resultado da Operação
-C <= 		S_NB(NB - 1 downto 0) after Ttrans  when cUla = "000" else
-			S_NB(NB - 1 downto 0) after Tsom  	when cUla = "001" else
-			S_NB(NB - 1 downto 0) after Ttrans  when cUla = "010" else
-			S_NB(NB - 1 downto 0) after Tsub  	when cUla = "011" else
-			S_NB(NB - 1 downto 0) after Tgate 	when cUla = "100" else
-			S_NB(NB - 1 downto 0) after Tgate 	when cUla = "101" else
-			S_NB(NB - 1 downto 0) after 2*Tgate when cUla = "110" else
-			S_NB(NB - 1 downto 0) after Tgate 	when cUla = "111";
+C <= 		S_NB(NB - 1 downto 0) after Ttrans  when cUla = "0000" else
+			S_NB(NB - 1 downto 0) after Tsom  	when cUla = "0001" else
+			S_NB(NB - 1 downto 0) after Ttrans  when cUla = "0010" else
+			S_NB(NB - 1 downto 0) after Tsub  	when cUla = "0011" else
+			S_NB(NB - 1 downto 0) after Tgate 	when cUla = "0100" else
+			S_NB(NB - 1 downto 0) after Tgate 	when cUla = "0101" else
+			S_NB(NB - 1 downto 0) after Tsom    when cUla = "0110" else
+			S_NB(NB - 1 downto 0) after Tsom 	when cUla = "0111" else
+			S_NB(NB - 1 downto 0)			 	when cUla = "1000";
 -- Atualização do sinal
 Sinal <= S_NB(NB - 1) after Tsom;
 -- Atualização de Zero
-Equal <= '1' when A = B else '0';
-Compare <= '1' when A > B else '0';
+Zero <= '1'  after Tsom when S_NB(NB - 1 downto 0) = Zer else
+					'0' after Tsom ;
 
-	
+ 
+
+deslocador: deslocador_combinatorio generic map (NB, n, 1 ns) port map ('1', A, D);
+---------------------------------------------------
 
 end ULAmodified;
