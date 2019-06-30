@@ -21,7 +21,9 @@ architecture ALUControl of ALUControl is
 
 ---- Architecture declarations -----
 ---- Signal declarations used on the diagram ----
-signal vetorEntrada : in std_logic_vector(8 downto 0);
+signal vetorEntrada : std_logic_vector(8 downto 0);
+
+signal FEnable : std_logic;
 
 vetorEntrada(0) <= ALUOp(0);
 vetorEntrada(1) <= ALUOp(1);
@@ -40,37 +42,35 @@ begin
 process (vetorEntrada)
 
 begin
-	case vetorEntrada is
-		when "000000000" =>  ULASet <= "000";
+	if ALUOp = "010" then	
+		case functField is
+			when "100000" => ULASet <= "001";
 							 MulBit <= '0';
-		
-		when "001000000" =>  ULASet <= "111";
+			when "101010" => ULASet <= "110";
 							 MulBit <= '0';
-		
-		when "010100000" =>  ULASet <= "001";
+			when "001000" => ULASet <= "000";
 							 MulBit <= '0';
-		
-		when "010101010" =>  ULASet <= "110";
+			when "100001" => ULASet <= "001";
 							 MulBit <= '0';
-		
-		when "010001000" =>  ULASet <= "000";
-							 MulBit <= '0';	
-		
-		when "010100001" =>  ULASet <= "001";
+			when "000000" => ULASet <= "000";
 							 MulBit <= '0';
-		
-		when "010000000" =>  ULASet <= "000";
-							 MulBit <= '0';
-	   
-		when "010110000" =>  ULASet <= "000";
+			when "110001" => ULASet <= "000";
 							 MulBit <= '1';
-		
-		when "011000000" =>  ULASet <= "110";
-							 MulBit <= '0';	
-		
-		when "100000000" =>  ULASet <= "001";
+			when others   => ULASet <= "000";
 							 MulBit <= '0';
 		end case;
+	else
+		case ALUOp is
+			when "000" => ULASet <= "000";
+						  MulBit <= '0';
+			when "001" => ULASet <= "001";
+						  MulBit <= '0';
+			when "011" => ULASet <= "110";
+						  MulBit <= '0';
+			when "100" => ULASet <= "001";
+						  MulBit <= '0';
+		end case;
+	end if;
 	 
 end process;
 
