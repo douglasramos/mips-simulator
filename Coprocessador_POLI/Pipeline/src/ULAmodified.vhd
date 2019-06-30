@@ -80,5 +80,6 @@ Sinal <= S_NB(NB - 1) after Tsom;
 Equal <= '1' when A = B else '0';
 Compare <= '1' when A > B else '0';
 
+	
 
 end ULAmodified;
