@@ -27,16 +27,14 @@ entity Cache_I is
 		hit:             out std_logic := '0';
 		
 		-- I/O relacionados ao IF stage
-        cpu_adrr: in  word_type;
+        cpu_adrr: in  std_logic_vector(15 downto 0);
         data_out: out word_type;	
 
-        -- I/O relacionados a Memória princial
+        -- I/O relacionados a Memoria princial
         mem_bloco_data: in  word_vector_type(15 downto 0);
-		mem_addr:       out word_type := (others => '0');
+		mem_addr:       out std_logic_vector(15 downto 0) := (others => '0')
 		
-		valid: out std_logic
-		
-        
+		   
     );
 end entity Cache_I;
 
@@ -50,7 +48,7 @@ architecture Cache_I_arch of Cache_I is
 	--- Cada "linha" no cache possui valid + tag + data
 	    type cache_row_type is record
         valid: std_logic;
-        tag:   std_logic_vector(17 downto 0);
+        tag:   std_logic_vector(1 downto 0);
         data:  word_vector_type(palavras_por_bloco - 1 downto 0);
     end record cache_row_type;
 
@@ -64,14 +62,14 @@ architecture Cache_I_arch of Cache_I is
 	signal mem_bloc_addr: natural;
 	signal index: natural;
 	signal block_offset: natural;
-	signal tag: std_logic_vector(17 downto 0);
+	signal tag: std_logic_vector(1 downto 0);
 	
 		
 begin 
-	-- obtem campos do cache a partir do endereço de entrada
-	mem_bloc_addr <= to_integer(unsigned(cpu_adrr(31 downto 6)));
+	-- obtem campos do cache a partir do endereco de entrada
+	mem_bloc_addr <= to_integer(unsigned(cpu_adrr(15 downto 6)));
 	index <= mem_bloc_addr mod numero_blocos;
-	tag <= cpu_adrr(31 downto 14);
+	tag <= cpu_adrr(15 downto 14);
 	block_offset <= to_integer(unsigned(cpu_adrr(5 downto 2)));
 		
 							
