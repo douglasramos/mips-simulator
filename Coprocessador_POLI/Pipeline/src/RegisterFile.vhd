@@ -24,13 +24,13 @@ use ieee.numeric_std.all;
 
 entity RegisterFile is
   generic(
-       NBend : integer := 4;
-       NBdado : integer := 8;
+       NBend : integer := 5;
+       NBdado : integer := 32;
        Tread : time := 5 ns;
        Twrite : time := 5 ns
   );
   port(
-       clk : in std_logic;
+       clk, reset : in std_logic;
        we : in std_logic;
        dadoina : in std_logic_vector(NBdado - 1 downto 0);
 	   endwrite : in std_logic_vector(NBend - 1 downto 0);
@@ -46,7 +46,7 @@ architecture RegisterFile of RegisterFile is
 ---- Architecture declarations -----
 type ram_type is array (0 to 2**NBend - 1)
         of std_logic_vector (NBdado - 1 downto 0);
-signal ram: ram_type;
+signal ram: ram_type:= (others=>(others=>'0'));
 
 
 
@@ -65,7 +65,15 @@ process (clk)
 -- "Update sensitivity list automatically" option status
 -- declarations
 begin
-	 if (clk'event and clk = '1') then
+	if (reset = '1') then
+		for i in ram'range loop
+  			ram(i) <= "00000000000000000000000000000000";
+		end loop; 
+		 ram(28) <= "00000000000000000000000000100000";
+		 ram(29) <= "00000000000000001111111111111111";
+		 ram(30) <= "00000000000001111111111111111111";
+		 ram(31) <= "00000000000000000000000000000000";
+	 elsif (clk'event and clk = '1' and reset = '0') then
         if (we = '1') then
            ram(to_integer(unsigned(endwrite))) <= dadoina after Twrite;
         end if;
@@ -80,4 +88,6 @@ dadoouta <= ram(to_integer(unsigned
 dadooutb <= ram(to_integer(unsigned
 								(endb_reg))) after Tread;
 
+								
+								
 end RegisterFile;
