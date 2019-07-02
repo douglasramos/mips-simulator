@@ -61,7 +61,7 @@ architecture Cache_I_arch of Cache_I is
     signal cache: cache_type := (others => cache_row_init); --- definicao do cache
 	signal mem_bloc_addr: natural;
 	signal index: natural;
-	signal block_offset: natural;
+	signal word_offset: natural;
 	signal tag: std_logic_vector(1 downto 0);
 	
 		
@@ -70,12 +70,12 @@ begin
 	mem_bloc_addr <= to_integer(unsigned(cpu_adrr(15 downto 6)));
 	index <= mem_bloc_addr mod numero_blocos;
 	tag <= cpu_adrr(15 downto 14);
-	block_offset <= to_integer(unsigned(cpu_adrr(5 downto 2)));
+	word_offset <= to_integer(unsigned(cpu_adrr(5 downto 2)));
 		
 							
     --  saidas
 	hit <= '1' when cache(index).valid = '1' and cache(index).tag = tag else '0';
-	data_out <=	cache(index).data(block_offset);
+	data_out <=	cache(index).data(word_offset);
 	mem_addr <= cpu_adrr;
 	
 	-- atualizacao do cache de acordo com os sinais de controle
