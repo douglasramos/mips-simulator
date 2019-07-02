@@ -32,13 +32,14 @@ entity Cache_D is
 		
 		-- I/O relacionados ao MEM stage
         cpu_adrr: in  std_logic_vector(15 downto 0);
-		data_in : in  word_type;
-        data_out: out word_type;	
+		data_in : in  word_type;	
 
         -- I/O relacionados a Memoria princial
         mem_block_data: in  word_vector_type(15 downto 0);
-		mem_addr:       out std_logic_vector(15 downto 0) := (others => '0')		
+		mem_addr:       out std_logic_vector(15 downto 0) := (others => '0');		
         
+		-- I/O relacionados a write buffer
+		data_out: out  word_vector_type(15 downto 0) := (others => word_vector_init)
     );
 end entity Cache_D;
 
@@ -107,8 +108,6 @@ begin
 	--  saidas
 	hit <= hit_signal;
 	
-	data_out <=	cache(index).set(set_index).data(word_offset) after time_acess;
-	
 	mem_addr <= cpu_adrr;
 	
 	dirty_bit <= cache(index).set(set_index).dirty;
@@ -133,13 +132,13 @@ begin
 				cache(index).set(set_index).data <= mem_block_data;	
 				
 			elsif (write_options = "10") then
-				cache(index).set(set_index).data(word_offset) <= data_in;
+				cache(index).set(set_index).data(word_offset) <= data_in after time_acess;
 				cache(index).set(set_index).dirty <= '1'; 
 			end if;
 			
 			-- Escreve no buffer
 			if (buffer_write'event and buffer_write = '1') then
-				data_out <= cache(index).set(set_index).data(word_offset);
+				data_out <= cache(index).set(set_index).data after time_acess;
 			end if;
 			
 		end if;
