@@ -52,7 +52,7 @@ end entity CacheD_Controle;
 architecture CacheD_Controle_arch of CacheD_Controle is	 	  
 							  
 	-- Definicao de estados
-    type states is (INIT, READY, CTAG, WRITE, CTAG2, HIT, MISS, MEM, BUFF);
+    type states is (INIT, READY, CTAG, WRITE, WBWRITE, CTAG2, HIT, MISS, MEM, BUFF);
     signal state: states := INIT; 
 	
 begin 
@@ -94,7 +94,14 @@ begin
 				   state <= READY;
 				
 				when BUFF =>
-					if
+					if wb_ready = '1' then
+						state <= WBWRITE;
+					elsif wb_ready = '0' then
+						state <= BUFF;
+					end if;
+				
+				when WBWRITE =>
+					state <= READY;
 						
 				--- estado Compare Tag2 
 				--- (segunda comparacao apos MISS)
@@ -147,6 +154,8 @@ begin
 	         	   				  
     -- mem_enable		
 	mem_enable <= '1' when state = MISS else '0';
-		          
+	
+	-- write buffer
+	wb_write <= '1' when state = WBWRITE else '0';
 
 end architecture CacheD_Controle_arch;

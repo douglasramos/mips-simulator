@@ -17,7 +17,7 @@ use pipeline.types.all;
 
 entity Cache_I is
     generic (
-        tempo_acesso: in time := 5 ns
+        access_time: in time := 5 ns
     );
     port (
 		
