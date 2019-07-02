@@ -17,7 +17,7 @@ use pipeline.types.all;
 
 entity Cache_D is
     generic (
-        tempo_acesso: in time := 5 ns
+        time_acess: in time := 5 ns
     );
     port (
 		
@@ -28,6 +28,7 @@ entity Cache_D is
 		update_info:     in std_logic;
 		hit:             out std_logic := '0';
 		dirty_bit:       out std_logic := '0';
+		set_valid:       out std_logic_vector(1 downto 0) := "00";
 		
 		-- I/O relacionados ao MEM stage
         cpu_adrr: in  std_logic_vector(15 downto 0);
@@ -78,9 +79,10 @@ architecture Cache_D_arch of Cache_D is
     signal cache: cache_type := (others => cache_set_init); --- definicao do cache
 	signal mem_block_addr: natural;
 	signal index: natural;
-	signal block_offset: natural;
+	signal word_offset: natural;
 	signal tag: std_logic_vector(1 downto 0);
 	signal set_index: natural;
+	signal hit_signal: std_logic; --- sinal interno utilizado para poder usar o hit na logico do set_index
 	
 	
 begin 
@@ -88,29 +90,37 @@ begin
 	mem_block_addr <= to_integer(unsigned(cpu_adrr(15 downto 6)));
 	index <= mem_block_addr mod number_of_sets;
 	tag <= cpu_adrr(15 downto 14);
-	block_offset <= to_integer(unsigned(cpu_adrr(5 downto 2)));
-	
-	-- a partir do index enviado pelo controle, define o index do conjunto
-    set_index <= 1 when control_index = '1' else 0;
-	
-    --  saidas
+	word_offset <= to_integer(unsigned(cpu_adrr(5 downto 2)));
+		
+	-- Logica que define o index dentro do conjunto em caso de hit ou nao.
+	-- Note que caso o conjunto esteja cheio, troca-se sempre o primeiro bloco
+	set_index <= 0 when (cache(index).set(0).valid = '1' and cache(index).set(0).tag = tag) or
+	                    (hit_signal = '0' and cache(index).set(0).valid = '0') else
+    			 1 when (cache(index).set(1).valid = '1' and cache(index).set(1).tag = tag) or
+			            (hit_signal = '0' and cache(index).set(1).valid = '0') else 0;
 	
 	-- dois (2 blocos por conjunto) comparadores em paralelo para definir o hit
-	hit <= '1' when (cache(index).set(0).valid = '1' and cache(index).set(0).tag = tag) or
+	hit_signal <= '1' when (cache(index).set(0).valid = '1' and cache(index).set(0).tag = tag) or
 	                (cache(index).set(1).valid = '1' and cache(index).set(1).tag = tag)
                else '0';
 	
-	data_out <=	cache(index).set(set_index).data(block_offset);
+	--  saidas
+	hit <= hit_signal;
+	
+	data_out <=	cache(index).set(set_index).data(word_offset) after time_acess;
+	
 	mem_addr <= cpu_adrr;
 	
 	dirty_bit <= cache(index).set(set_index).dirty;
+	
+	set_valid <= cache(index).set(0).valid & cache(index).set(1).valid;
 	
 	-- atualizacao do cache de acordo com os sinais de controle
 	process(update_info, write_options, buffer_write)
 	begin
 		if (update_info'event or write_options'event) then
 			
-			-- atualiza info (tag e valid bit
+			-- atualiza info (tag e valid bit)
 			if (update_info'event and update_info = '1') then
 				cache(index).set(set_index).tag <= tag;
 				cache(index).set(set_index).valid <= '1';
@@ -123,13 +133,13 @@ begin
 				cache(index).set(set_index).data <= mem_block_data;	
 				
 			elsif (write_options = "10") then
-				cache(index).set(set_index).data(block_offset) <= data_in;
+				cache(index).set(set_index).data(word_offset) <= data_in;
 				cache(index).set(set_index).dirty <= '1'; 
 			end if;
 			
 			-- Escreve no buffer
 			if (buffer_write'event and buffer_write = '1') then
-				data_out <= cache(index).set(set_index).data(block_offset);
+				data_out <= cache(index).set(set_index).data(word_offset);
 			end if;
 			
 		end if;
